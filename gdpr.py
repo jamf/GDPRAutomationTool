@@ -9,6 +9,14 @@ search_username=input("Search Username:")
 
 api_url = 'https://'+instance+'/JSSResource'
 
+# search jamf pro users
+jss_users_api=api_url+'/users/name/'+search_username
+jss_users_response = requests.get(jss_users_api, auth=(username, password), headers={'Accept': 'application/json'})
+
+if jss_users_response.status_code == 200:
+    jss_user = jss_users_response.json()
+    print(jss_user)
+
 # search jamf pro user accounts
 jss_account_api=api_url+'/accounts/username/'+search_username
 jss_account_response = requests.get(jss_account_api, auth=(username, password), headers={'Accept': 'application/json'})
