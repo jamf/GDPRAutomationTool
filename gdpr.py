@@ -21,12 +21,11 @@ while loop:
 	if jss_users_response.status_code == 200:
 		jss_user = jss_users_response.json()
 		user_data['user'] = jss_user['user']
-		print(jss_user)
+		print('User found')
 
 		# user's mobile devices
 		mobile_devices = []
 		for device in jss_user['user']['links']['mobile_devices']:
-			print(device['id'])
 			device_api_url = api_url+'/mobiledevices/id/'+str(device['id'])
 			device_response = requests.get(device_api_url, auth=(username, password), headers={'Accept': 'application/json'})
 			device_response_json = device_response.json()
@@ -34,11 +33,11 @@ while loop:
 
 		if len(mobile_devices) > 0:
 			user_data['devices'] = mobile_devices
+			print(str(len(mobile_devices))+' mobile devices found')
 
 		# user's computers
 		computers = []
 		for device in jss_user['user']['links']['computers']:
-			print(device['id'])
 			device_api_url = api_url+'/computers/id/'+str(device['id'])
 			device_response = requests.get(device_api_url, auth=(username, password), headers={'Accept': 'application/json'})
 			device_response_json = device_response.json()
@@ -46,6 +45,7 @@ while loop:
 
 		if len(computers) > 0:
 			user_data['computers'] = computers
+			print(str(len(computers))+' computers found')
 
 	# search jamf pro user accounts
 	jss_account_api=api_url+'/accounts/username/'+search_username
@@ -73,8 +73,7 @@ while loop:
 			if ldap_server_search_response.status_code == 200:
 				ldap_server_search_response_json = ldap_server_search_response.json()
 				ldap_results.append({server['name']: ldap_server_search_response_json['ldap_users']})
-				print(server['name'])
-				print(ldap_server_search_response_json['ldap_users'])
+				print('LDAP account found on: '+server['name'])
 
 	if len(ldap_results) > 0:
 		user_data['ldap'] = ldap_results
