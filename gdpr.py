@@ -3,13 +3,13 @@ import getpass
 import requests
 import json
 
-instance=input("Jamf Pro URL:")
-username=input("Jamf Pro Username:")
-password=getpass.getpass("Jamf Pro Password:")
+instance = input("Jamf Pro URL:")
+username = input("Jamf Pro Username:")
+password = getpass.getpass("Jamf Pro Password:")
 
 loop = True
 while loop:
-	search_username=input("Search Username:")
+	search_username = input("Search Username:")
 
 	file_name = instance+'_'+search_username+'.json'
 	file = open(file_name, 'w')
@@ -18,13 +18,24 @@ while loop:
 	api_url = 'https://'+instance+'/JSSResource'
 
 	# search jamf pro users
-	jss_users_api=api_url+'/users/name/'+search_username
+	jss_users_api = api_url+'/users/name/'+search_username
 	jss_users_response = requests.get(jss_users_api, auth=(username, password), headers={'Accept': 'application/json'})
 
 	if jss_users_response.status_code == 200:
 		jss_user = jss_users_response.json()
 		user_data['user'] = jss_user['user']
 		print(jss_user)
+
+		mobile_devices = []
+		for device in jss_user['user']['links']['mobile_devices']:
+			print(device['id'])
+			device_api_url = api_url+'/mobiledevices/id/'+str(device['id'])
+			device_response = requests.get(device_api_url, auth=(username, password), headers={'Accept': 'application/json'})
+			device_response_json = device_response.json()
+			mobile_devices.append(device_response_json['mobile_device'])
+
+		if len(mobile_devices) > 0:
+			user_data['devices'] = mobile_devices
 
 	# search jamf pro user accounts
 	jss_account_api=api_url+'/accounts/username/'+search_username
@@ -36,7 +47,7 @@ while loop:
 		print(jss_account)
 
 	# search ldap user accounts
-	ldap_servers_url=api_url+'/ldapservers'
+	ldap_servers_url = api_url+'/ldapservers'
 	ldap_servers_response = requests.get(ldap_servers_url, auth=(username, password), headers={'Accept': 'application/json'})
 
 	if ldap_servers_response.status_code == 200:
@@ -62,6 +73,6 @@ while loop:
 	file.write(file_contents)
 	file.close()
 
-	again=input('Search new user?: [y/n] ')
+	again = input('Search new user?: [y/n] ')
 	if again == 'n':
 		loop = False
