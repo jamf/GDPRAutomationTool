@@ -7,15 +7,12 @@ instance = input("Jamf Pro URL:")
 username = input("Jamf Pro Username:")
 password = getpass.getpass("Jamf Pro Password:")
 
+api_url = 'https://'+instance+'/JSSResource'
+
 loop = True
 while loop:
-	search_username = input("Search Username:")
-
-	file_name = instance+'_'+search_username+'.json'
-	file = open(file_name, 'w')
 	user_data = {}
-
-	api_url = 'https://'+instance+'/JSSResource'
+	search_username = input("Search Username:")
 
 	# search jamf pro users
 	jss_users_api = api_url+'/users/name/'+search_username
@@ -82,9 +79,16 @@ while loop:
 	if len(ldap_results) > 0:
 		user_data['ldap'] = ldap_results
 
-	file_contents = json.dumps(user_data)
-	file.write(file_contents)
-	file.close()
+	# only write to file if data exists
+	if user_data:
+		file_name = instance+'_'+search_username+'.json'
+		file = open(file_name, 'w')
+		file_contents = json.dumps(user_data)
+		file.write(file_contents)
+		file.close()
+		print('Saved: '+file_name)
+	else:
+		print('No results found for: '+search_username)
 
 	again = input('Search new user?: [y/n] ')
 	if again == 'n':
