@@ -26,6 +26,7 @@ while loop:
 		user_data['user'] = jss_user['user']
 		print(jss_user)
 
+		# user's mobile devices
 		mobile_devices = []
 		for device in jss_user['user']['links']['mobile_devices']:
 			print(device['id'])
@@ -36,6 +37,18 @@ while loop:
 
 		if len(mobile_devices) > 0:
 			user_data['devices'] = mobile_devices
+
+		# user's computers
+		computers = []
+		for device in jss_user['user']['links']['computers']:
+			print(device['id'])
+			device_api_url = api_url+'/computers/id/'+str(device['id'])
+			device_response = requests.get(device_api_url, auth=(username, password), headers={'Accept': 'application/json'})
+			device_response_json = device_response.json()
+			computers.append(device_response_json['computer'])
+
+		if len(computers) > 0:
+			user_data['computers'] = computers
 
 	# search jamf pro user accounts
 	jss_account_api=api_url+'/accounts/username/'+search_username
