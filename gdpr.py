@@ -1,6 +1,7 @@
 import sys
 import getpass
 import requests
+import json
 
 instance=input("Jamf Pro URL:")
 username=input("Jamf Pro Username:")
@@ -10,6 +11,10 @@ loop = True
 while loop:
 	search_username=input("Search Username:")
 
+	file_name = instance+'_'+search_username+'.json'
+	file = open(file_name, 'w')
+	user_data = {}
+
 	api_url = 'https://'+instance+'/JSSResource'
 
 	# search jamf pro users
@@ -18,6 +23,7 @@ while loop:
 
 	if jss_users_response.status_code == 200:
 		jss_user = jss_users_response.json()
+		user_data['user'] = jss_user['user']
 		print(jss_user)
 
 	# search jamf pro user accounts
@@ -26,6 +32,7 @@ while loop:
 
 	if jss_account_response.status_code == 200:
 		jss_account = jss_account_response.json()
+		user_data['account'] = jss_account['account']
 		print(jss_account)
 
 	# search ldap user accounts
@@ -36,6 +43,7 @@ while loop:
 		ldap_servers = ldap_servers_response.json()
 		servers = ldap_servers['ldap_servers']
 
+		ldap_results = []
 		for server in servers:
 			ldap_server_id = str(server['id'])
 			ldap_server_search_url = api_url+'/ldapservers/id/'+ldap_server_id+'/user/'+search_username
@@ -43,8 +51,16 @@ while loop:
 
 			if ldap_server_search_response.status_code == 200:
 				ldap_server_search_response_json = ldap_server_search_response.json()
+				ldap_results.append({server['name']: ldap_server_search_response_json['ldap_users']})
 				print(server['name'])
-				print(ldap_server_search_response_json)
+				print(ldap_server_search_response_json['ldap_users'])
+
+	if len(ldap_results) > 0:
+		user_data['ldap'] = ldap_results
+
+	file_contents = json.dumps(user_data)
+	file.write(file_contents)
+	file.close()
 
 	again=input('Search new user?: [y/n] ')
 	if again == 'n':
