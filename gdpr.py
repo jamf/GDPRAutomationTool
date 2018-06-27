@@ -78,7 +78,7 @@ def get_computers(api_url, api_auth, devices):
 
 
 def main():
-    print("GDRP")
+    print("GDPR")
 
     instance = input("Jamf Pro URL:")
     username = input("Jamf Pro Username:")
