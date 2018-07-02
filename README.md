@@ -2,14 +2,15 @@ GDPR Script
 
 This script is used to gather all personal information related to a specific user within Jamf Pro along with any devices their account is tied to as they may also contain more personal information.
 
-Locations where personal information can be found in the API:
-```
-/users/name/<username>
-/accounts/username/<username>
-/ldapservers/id/<id>/user/<username>
-/computers/id/<id>
-/mobiledevices/id/<id>
-```
+Locations where personal information can be found in the API & Required Jamf Pro account permissions in order to retrieve all data:
+
+| Resource                             | Permission |
+| ------------------------------------ | ------------------------------- |
+| /accounts/username/[username]        | Jamf Pro User Accounts & Groups |
+| /ldapservers/id/[id]/user/[username] | LDAP Servers |
+| /users/name/[username]               | Users |
+| /computers/id/[id]                   | Computers |
+| /mobiledevices/id/[id]               | Mobile Devices |
 
 The script looks through these API endpoints for a specified username and outputs the results to a JSON file.
 
